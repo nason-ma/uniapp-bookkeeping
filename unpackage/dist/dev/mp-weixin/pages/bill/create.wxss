@@ -1,0 +1,43 @@
+
+.asc.data-v-59d313ca {
+	-webkit-align-self: center;
+	        align-self: center;
+}
+.cu-form-group.data-v-59d313ca {
+	text-align: left;
+	padding-left: 10rpx;
+}
+.cu-form-group textarea.data-v-59d313ca {
+	margin: 10rpx 0 0 0;
+}
+.amount-wrap .amount-input.data-v-59d313ca {
+	font-size: 66rpx;
+	color: black;
+	font-weight: bold;
+	padding-left: 10rpx;
+	height: 80rpx;
+}
+.amount-wrap .margin-top-xl.data-v-59d313ca {
+	margin-top: 60rpx;
+}
+.border-bottom.data-v-59d313ca {
+	border-bottom: 1px solid #e7ebed;
+}
+.cu-list .iconfont.data-v-59d313ca {
+	font-size: 48rpx;
+}
+.screen-swiper.data-v-59d313ca {
+	min-height: 320rpx;
+}
+.cu-list.grid>.cu-item .text.data-v-59d313ca {
+	font-size: 22rpx;
+	margin-top: 10rpx;
+	line-height: 40rpx;
+}
+.cu-bar .action.data-v-59d313ca:first-child {
+	margin-left: 10rpx;
+}
+.confrimBtn.data-v-59d313ca {
+	padding: 10rpx 30rpx;
+}
+

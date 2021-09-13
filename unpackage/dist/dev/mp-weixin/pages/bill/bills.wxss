@@ -1,0 +1,16 @@
+
+.cu-list.menu-avatar>.cu-item .content.data-v-37c4dc7d {
+	width: calc(100% - 96rpx - 140rpx - 120rpx - 20rpx);
+}
+.cu-avatar.data-v-37c4dc7d {
+	width: 80rpx;
+	height: 80rpx;
+	background-color: unset;
+}
+.margin-top-xxl.data-v-37c4dc7d {
+	margin-top: 100rpx;
+}
+.category-icon.data-v-37c4dc7d {
+	font-size: 68rpx;
+}
+

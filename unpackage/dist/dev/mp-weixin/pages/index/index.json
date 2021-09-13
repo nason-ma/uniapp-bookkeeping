@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "bill-create": "/pages/bill/create",
+    "auth": "/pages/auth/auth"
+  }
+}

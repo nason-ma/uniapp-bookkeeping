@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "u-icon": "/uview-ui/components/u-icon/u-icon",
+    "u-picker": "/uview-ui/components/u-picker/u-picker",
+    "bills": "/pages/bill/bills"
+  }
+}
