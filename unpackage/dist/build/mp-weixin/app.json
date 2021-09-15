@@ -1,0 +1,45 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/statistics/index",
+    "pages/auth/auth",
+    "pages/bill/bills",
+    "pages/bill/form",
+    "pages/bill/detail",
+    "pages/plugin/indexes",
+    "pages/plugin/animation",
+    "pages/plugin/drawer",
+    "pages/plugin/verticalnav"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarBackgroundColor": "#0faeff",
+    "navigationBarTitleText": "nason",
+    "navigationStyle": "custom",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#909399",
+    "selectedColor": "#2979ff",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "/static/tabbar/list.png",
+        "selectedIconPath": "/static/tabbar/list_cur.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/statistics/index",
+        "iconPath": "/static/tabbar/tongji.png",
+        "selectedIconPath": "/static/tabbar/tongji_cur.png",
+        "text": "统计"
+      }
+    ]
+  },
+  "usingComponents": {
+    "cu-custom": "/colorui/components/cu-custom"
+  },
+  "sitemapLocation": "sitemap.json"
+}

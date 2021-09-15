@@ -26,20 +26,27 @@ const install = (Vue, vm) => {
 		// 引用token
 		// 方式一，存放在vuex的token，假设使用了uView封装的vuex方式
 		config.header.Authorization = 'Bearer ' + vm.vuex_token;
+		if (!vm.vuex_scopeUserInfo) {
+			return false;
+		}
 
 		return config;
 	}
 
 	// 响应拦截，如配置，每次请求结束都会执行本方法
 	Vue.prototype.$u.http.interceptor.response = async (res) => {
-		if (res.statusCode == 200 || res.statusCode == 201) {
+		if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 204) {
 			// res为服务端返回值，可能有code，result等字段
 			// 这里对res.result进行返回，将会在this.$u.post(url).then(res => {})的then回调中的res的到
 			// 如果配置了originalData为true，请留意这里的返回值
 			return res.data;
 		} else if (res.statusCode == 401) {
 			// 401为token失效
+			uni.showLoading({
+			    title: '登录中'
+			});
 			const refreshResult = await RefreshToken(res, vm);
+			uni.hideLoading();
 			return refreshResult.data;
 		} else {
 			// 如果返回false，则会调用Promise的reject回调，
@@ -85,7 +92,7 @@ async function RefreshToken(response, vm) {
 			icon: 'none'
 		})
 		uni.redirectTo({
-			url: "/pages/index/index"
+			url: "/pages/auth/auth"
 		})
 	}
 }

@@ -1,30 +1,11 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/statistics/index",
     "pages/auth/auth",
-    "pages/basics/layout",
-    "pages/basics/background",
-    "pages/basics/text",
-    "pages/basics/icon",
-    "pages/basics/button",
-    "pages/basics/design",
-    "pages/basics/tag",
-    "pages/basics/avatar",
-    "pages/basics/progress",
-    "pages/basics/shadow",
-    "pages/basics/loading",
     "pages/bill/bills",
-    "pages/bill/create",
-    "pages/component/bar",
-    "pages/component/nav",
-    "pages/component/list",
-    "pages/component/card",
-    "pages/component/form",
-    "pages/component/timeline",
-    "pages/component/chat",
-    "pages/component/swiper",
-    "pages/component/modal",
-    "pages/component/steps",
+    "pages/bill/form",
+    "pages/bill/detail",
     "pages/plugin/indexes",
     "pages/plugin/animation",
     "pages/plugin/drawer",
@@ -32,16 +13,32 @@
   ],
   "subPackages": [],
   "window": {
-    "navigationBarBackgroundColor": "#0081ff",
-    "navigationBarTitleText": "ColorUi for UniApp",
+    "navigationBarBackgroundColor": "#0faeff",
+    "navigationBarTitleText": "nason",
     "navigationStyle": "custom",
     "navigationBarTextStyle": "white"
   },
+  "tabBar": {
+    "color": "#909399",
+    "selectedColor": "#2979ff",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "/static/tabbar/list.png",
+        "selectedIconPath": "/static/tabbar/list_cur.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/statistics/index",
+        "iconPath": "/static/tabbar/tongji.png",
+        "selectedIconPath": "/static/tabbar/tongji_cur.png",
+        "text": "统计"
+      }
+    ]
+  },
   "usingComponents": {
-    "basics": "/pages/basics/home",
-    "components": "/pages/component/home",
-    "plugin": "/pages/plugin/home",
-    "statistics": "/pages/statistics/home",
     "cu-custom": "/colorui/components/cu-custom"
   }
 }

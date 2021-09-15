@@ -1,91 +1,164 @@
 <template>
 	<view>
-		<basics v-if="PageCur=='basics'"></basics>
-		<statistics v-if="PageCur=='statistic'"></statistics>
-		<view class="cu-bar tabbar bg-white shadow foot">
-			<view class="action" @click="NavChange" data-cur="basics">
-				<view class='cuIcon-cu-image'>
-					<image :src="'/static/tabbar/list' + [PageCur=='basics'?'_cur':''] + '.png'"></image>
-				</view>
-				<view :class="PageCur=='basics'?'text-blue':'text-gray'">首页</view>
+		<view class="index-header bg-blue" :style="[{paddingTop:CustomBar + 'px'}]">
+			<view class="title date" @tap="showPickerMonth">
+				{{ filterParams.year }} 年<text class="text-xxxl month-num">{{ filterParams.month }}</text>月
+				<u-icon class="arrow-down-fill" name="arrow-down-fill" color="#c0c4cc" size="30"></u-icon>
 			</view>
-			<view class="action text-gray add-action" @tap="showBillCreate">
-				<button class="cu-btn cuIcon-add bg-blue shadow"></button>
-				记一笔
-			</view>
-			<view class="action" @click="NavChange" data-cur="statistic">
-				<view class='cuIcon-cu-image'>
-					<image :src="'/static/tabbar/tongji' + [PageCur == 'statistic'?'_cur':''] + '.png'"></image>
+			<view class="title"><text class="cuIcon-emoji mr"></text> {{ quotation }}</view>
+			<image src="/static/images/wave.gif" mode="scaleToFill" class="gif-wave"></image>
+		</view>
+		<view class="padding flex text-center text-grey bg-white shadow-warp">
+			<view class="flex flex-sub flex-direction solid-right">
+				<view class="text-xxl text-orange text-price">{{ decAmount }}</view>
+				<view class="margin-top-sm">
+					<text class="cuIcon-moneybag mr"></text> 支出
 				</view>
-				<view :class="PageCur=='statistic'?'text-blue':'text-gray'">统计</view>
+			</view>
+			<view class="flex flex-sub flex-direction">
+				<view class="text-xxl text-blue text-price">{{ inAmount }}</view>
+				<view class="margin-top-sm">
+					<text class="cuIcon-moneybagfill mr"></text> 收入
+				</view>
 			</view>
 		</view>
 
-		<view class="cu-modal bottom-modal" :class="billCreateShow?'show':''">
-			<view class="cu-dialog">
-				<view v-if="vuex_scopeUserInfo">
-					<view class="cu-bar bg-white">
-						<view class="action">总账本</view>
-						<view class="action" @tap="hideBillCreate">
-							<text class="cuIcon-close text-red"></text>
-						</view>
-					</view>
-					<bill-create @reload="reload"></bill-create>
-				</view>
-				<view v-if="!vuex_scopeUserInfo">
-					<view class="cu-bar bg-white">
-						<view class="action">授权登录</view>
-						<view class="action" @tap="hideBillCreate">
-							<text class="cuIcon-close text-red"></text>
-						</view>
-					</view>
-					<auth @reload="reload"></auth>
-				</view>
-			</view>
-		</view>
+		<bills :bills="billList" @reload="init"></bills>
+		<billform @reload="init"></billform>
+
+		<u-back-top :scroll-top="scrollTop" :bottom="60"></u-back-top>
+		<u-picker mode="time" v-model="pickerMonthShow" :params="pickerMonthParams" :end-year="filterParams.year"
+			title="账单月份" @confirm="pickerMonthConfirm">
+		</u-picker>
 	</view>
 </template>
 
 <script>
-	import BillCreate from "../bill/create.vue";
-	import auth from "../auth/auth.vue";
+	import bills from "../bill/bills.vue";
+	import billform from '../bill/form.vue';
 	export default {
-		onLoad: function(options) {
-			this.$u.api.isScopeUserInfo();
-		},
 		components: {
-			BillCreate,
-			auth
+			bills,
+			billform
 		},
 		data() {
 			return {
-				PageCur: 'basics',
-				billCreateShow: false
-			}
+				CustomBar: this.CustomBar,
+				inAmount: "0.00",
+				decAmount: "0.00",
+				quotation: "授权登录，开启记账之旅~",
+				filterParams: {
+					year: "",
+					month: ""
+				},
+				pickerMonthParams: {
+					year: true,
+					month: true,
+					day: false
+				},
+				pickerMonthShow: false,
+				billList: [],
+				scrollTop: 0
+			};
+		},
+		onLoad: async function(options) {
+			// console.log(this.$store.state.vuex_token);
+		},
+		onPageScroll(e) {
+			this.scrollTop = e.scrollTop;
+		},
+		onPullDownRefresh() {
+			this.init();
+			setTimeout(function() {
+				uni.stopPullDownRefresh();
+			}, 1000);
 		},
 		methods: {
-			NavChange: function(e) {
-				this.PageCur = e.currentTarget.dataset.cur
+			showPickerMonth: function() {
+				this.pickerMonthShow = true;
 			},
-
-			showBillCreate: function() {
-				this.billCreateShow = true;
+			pickerMonthConfirm: function(params) {
+				this.filterParams.year = params.year;
+				this.filterParams.month = parseInt(params.month);
+				this.init();
 			},
-
-			hideBillCreate: function() {
-				this.billCreateShow = false;
+			randomQuotation() {
+				this.$u.api.Share.randomQuotation().then(result => {
+					this.quotation = result.title;
+				});
 			},
-			
-			reload() {
-				this.hideBillCreate();
+			getIndex() {
+				this.$u.api.Bill.index(this.filterParams).then(result => {
+					this.inAmount = result.inAmount;
+					this.decAmount = result.decAmount;
+					this.billList = result.bills;
+				});
 			},
+			init() {
+				this.randomQuotation();
+				this.getIndex();
+			}
 		},
 		mounted() {
-			console.log(this.$store.state.vuex_token);
+			this.filterParams.year = new Date().getFullYear();
+			this.filterParams.month = new Date().getMonth() + 1;
+			if (!this.$store.state.vuex_scopeUserInfo) {
+				uni.redirectTo({
+					url: '/pages/auth/auth'
+				})
+			} 
+			
+			this.init();
 		}
 	}
 </script>
 
-<style>
+<style scoped>
+	.page {
+		height: 100vh;
+	}
 
+	.index-header {
+		padding: 100rpx 30rpx 50rpx 30rpx;
+		width: 100%;
+		background-image: url(../../static/images/defaultBg.png);
+		background-size: cover;
+		background-position: center;
+		position: relative;
+		z-index: 1;
+	}
+
+	.index-header .gif-wave {
+		position: absolute;
+		width: 100%;
+		bottom: 0;
+		left: 0;
+		z-index: 99;
+		mix-blend-mode: screen;
+		height: 100rpx;
+	}
+
+	.index-header view {
+		padding: 15rpx 0;
+	}
+
+	.index-header .date {
+		width: 40%;
+	}
+
+	.index-header .month-num {
+		margin: 0 10rpx;
+	}
+
+	.index-header .arrow-down-fill {
+		margin-left: 20rpx;
+	}
+
+	.text-xxxl {
+		font-size: 66rpx;
+	}
+
+	.mr {
+		margin-right: 10rpx;
+	}
 </style>

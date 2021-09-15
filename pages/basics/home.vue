@@ -24,11 +24,10 @@
 				</view>
 			</view>
 			
-			<bills :bills=billList></bills>
+			<bills :bills="billList"></bills>
 			
 			<u-picker mode="time" v-model="pickerMonthShow" :params="pickerMonthParams" :end-year="filterParams.year" title="账单月份" @confirm="pickerMonthConfirm">
 			</u-picker>
-			<view class="cu-tabbar-height"></view>
 		</scroll-view>
 	</view>
 </template>
@@ -60,7 +59,7 @@
 			};
 		},
 		onShow() {
-			console.log("success")
+			console.log("basics.show")
 		},
 		methods: {
 			showPickerMonth: function() {

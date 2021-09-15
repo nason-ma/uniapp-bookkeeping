@@ -5,23 +5,11 @@ import store from '@/store';
 let vuexStore = require("@/store/$u.mixin.js");
 Vue.mixin(vuexStore);
 
-import basics from './pages/basics/home.vue'
-Vue.component('basics',basics)
-
-import components from './pages/component/home.vue'
-Vue.component('components',components)
-
-import plugin from './pages/plugin/home.vue'
-Vue.component('plugin',plugin)
-
-import statistics from './pages/statistics/home.vue'
-Vue.component('statistics',statistics)
+import uView from "uview-ui";
+Vue.use(uView);
 
 import cuCustom from './colorui/components/cu-custom.vue'
 Vue.component('cu-custom',cuCustom)
-
-import uView from "uview-ui";
-Vue.use(uView);
 
 Vue.config.productionTip = false
 

@@ -1,4 +1,4 @@
-<template name="auth">
+<template>
 	<view class="page">
 		<view class='UCenter-bg padding'>
 			<image src='../../static/logo.png' class='png' mode='widthFix'></image>
@@ -16,7 +16,6 @@
 
 <script>
 	export default {
-		name: 'auth',
 		data() {
 			return {
 				code: ''
@@ -30,23 +29,29 @@
 					provider: 'weixin',
 					success: function(loginRes) {
 						that.code = loginRes.code;
+						that.$emit('hide');
 					}
 				});
 				uni.getUserProfile({
 					desc: '用于完善会员资料',
 					lang: 'zh_CN',
 					success: (res) => {
+						that.$u.vuex('vuex_scopeUserInfo', true);
 						that.$u.post('auth', {
 							code: that.code,
 							user_info: res.userInfo
 						}).then(result => {
-							that.$u.vuex('vuex_scopeUserInfo', true);
 							that.$u.vuex('vuex_token', result.access_token);
 							that.$u.vuex('vuex_tokenExpires', result.expires_in);
 							that.$u.vuex('vuex_tokenStart', that.NowTime());
 							that.$u.vuex('vuex_user', result.user);
-							that.$emit('reload')
-						})
+							// that.$emit('reload');
+							uni.switchTab({
+								url: '/pages/index/index'
+							})
+						}).catch(error => {
+							console.log(error);
+						}) 
 					}
 				})
 			}
@@ -58,9 +63,9 @@
 </script>
 
 <style scoped>
-	/* .page {
+	.page {
 		height: 100vh;
-	} */
+	}
 
 	.UCenter-bg {
 		/* background-image: url(https://image.weilanwl.com/color2.0/index.jpg); */
@@ -72,6 +77,7 @@
 		flex-direction: column;
 		align-items: center;
 		font-weight: 300;
+		margin-top: 200rpx;
 	}
 
 	.UCenter-bg image {

@@ -3,6 +3,7 @@ import Share from '../api/share.js';
 import Category from '../api/category.js';
 import Common from '../api/common.js';
 import Bill from '../api/bill.js';
+import Statistics from '../api/statistics.js';
 
 // 此处第二个参数vm，就是我们在页面使用的this，你可以通过vm获取vuex等操作
 const install = (Vue, vm) => {
@@ -13,14 +14,14 @@ const install = (Vue, vm) => {
 
 	// // 此处使用了传入的params参数，一切自定义即可
 	// let getInfo = (params = {}) => vm.$u.post(indexUrl, params);
-	let isScopeUserInfo = () => {
-		uni.getSetting({
+	let isScopeUserInfo = async() => {
+		await uni.getSetting({
 			success(res) {
 				if (!res.authSetting['scope.userInfo']) {
-					//这里调用授权
+					//未授权
 					vm.$u.vuex('vuex_scopeUserInfo', false);
 				} else {
-					//用户已经授权过了
+					//已授权
 					vm.$u.vuex('vuex_scopeUserInfo', true);
 				}
 			}
@@ -54,6 +55,7 @@ const install = (Vue, vm) => {
 		Category: Category(vm),
 		Common: Common(vm),
 		Bill: Bill(vm),
+		Statistics: Statistics(vm),
 		isScopeUserInfo,
 		login
 	};

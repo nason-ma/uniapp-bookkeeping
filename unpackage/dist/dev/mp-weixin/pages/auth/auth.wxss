@@ -1,66 +1,7 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* .page {
+.page.data-v-7ea503f4 {
 	height: 100vh;
-} */
+}
 .UCenter-bg.data-v-7ea503f4 {
 	/* background-image: url(https://image.weilanwl.com/color2.0/index.jpg); */
 	/* background-size: cover; */
@@ -80,6 +21,7 @@
 	-webkit-align-items: center;
 	        align-items: center;
 	font-weight: 300;
+	margin-top: 200rpx;
 }
 .UCenter-bg image.data-v-7ea503f4 {
 	width: 200rpx;

@@ -1,7 +1,19 @@
 <script>
 	import Vue from 'vue'
 	export default {
-		onLaunch: function() {
+		onLaunch: async function() {
+			let that = this;
+			await uni.getSetting({
+				success: function(res) {
+					if (!res.authSetting['scope.userInfo']) {
+						//未授权
+						that.$u.vuex('vuex_scopeUserInfo', false);
+					} else {
+						//已授权
+						that.$u.vuex('vuex_scopeUserInfo', true);
+					}
+				}
+			});
 			uni.getSystemInfo({
 				success: function(e) {
 					// #ifndef MP
@@ -123,14 +135,11 @@
 				return timer;
 			}
 		},
-		onShow: function() {
+		onShow: async function() {
 			console.log('App Show')
 		},
 		onHide: function() {
 			console.log('App Hide')
-		},
-		onLoad: function() {
-
 		}
 	}
 </script>

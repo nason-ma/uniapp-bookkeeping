@@ -7,6 +7,14 @@ let Bill = (vm) => {
 		
 		index: (params) => {
 			return vm.$u.post('bill/index', params);
+		},
+		
+		detail: (id) => {
+			return vm.$u.get('bill/detail/' + id + '?include=account,category');
+		},
+		
+		destroy: (id) => {
+			return vm.$u.delete('bill/' + id);
 		}
 	}
 }
