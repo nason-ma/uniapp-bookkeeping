@@ -152,6 +152,17 @@
 				categorySortData: []
 			}
 		},
+		onShow() {
+			if (this.params.year == '' || this.params.month == '') {
+				let year = new Date().getFullYear();
+				let month = new Date().getMonth() + 1;
+				month = month < 10 ? '0' + month : month;
+				this.date = year + '年' + month + '月';
+				this.params.year = year;
+				this.params.month = month;
+			}
+			this.init();
+		},
 		onPullDownRefresh() {
 			this.init();
 			setTimeout(function() {
@@ -228,14 +239,7 @@
 				})
 			} 
 			
-			let year = new Date().getFullYear();
-			let month = new Date().getMonth() + 1;
-			month = month < 10 ? '0' + month : month;
-			this.date = year + '年' + month + '月';
-			this.params.year = year;
-			this.params.month = month;
-
-			this.init();
+			// this.init();
 		}
 	}
 </script>

@@ -195,6 +195,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 var _bills = _interopRequireDefault(__webpack_require__(/*! ../bill/bills.vue */ 57));
 var _form = _interopRequireDefault(__webpack_require__(/*! ../bill/form.vue */ 64));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};}var _default =
 {
@@ -204,6 +205,7 @@ var _form = _interopRequireDefault(__webpack_require__(/*! ../bill/form.vue */ 6
 
   data: function data() {
     return {
+      headerHeight: 0,
       CustomBar: this.CustomBar,
       inAmount: "0.00",
       decAmount: "0.00",
@@ -225,6 +227,14 @@ var _form = _interopRequireDefault(__webpack_require__(/*! ../bill/form.vue */ 6
   onLoad: function () {var _onLoad = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee(options) {return _regenerator.default.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:case "end":return _context.stop();}}}, _callee);}));function onLoad(_x) {return _onLoad.apply(this, arguments);}return onLoad;}(),
 
 
+  onShow: function onShow() {
+    if (this.filterParams.year == '' || this.filterParams.month == '') {
+      this.filterParams.year = new Date().getFullYear();
+      this.filterParams.month = new Date().getMonth() + 1;
+    }
+
+    this.init();
+  },
   onPageScroll: function onPageScroll(e) {
     this.scrollTop = e.scrollTop;
   },
@@ -260,16 +270,18 @@ var _form = _interopRequireDefault(__webpack_require__(/*! ../bill/form.vue */ 6
       this.getIndex();
     } },
 
-  mounted: function mounted() {
-    this.filterParams.year = new Date().getFullYear();
-    this.filterParams.month = new Date().getMonth() + 1;
+  mounted: function mounted() {var _this3 = this;
     if (!this.$store.state.vuex_scopeUserInfo) {
       uni.redirectTo({
         url: '/pages/auth/auth' });
 
     }
 
-    this.init();
+    // this.init();
+    var query = uni.createSelectorQuery().in(this);
+    query.select('#header').boundingClientRect(function (data) {
+      _this3.headerHeight = data.height;
+    }).exec();
   } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
@@ -413,6 +425,10 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; //
+//
+//
+//
+//
 //
 //
 //
@@ -649,6 +665,9 @@ try {
     },
     uActionSheet: function() {
       return __webpack_require__.e(/*! import() | uview-ui/components/u-action-sheet/u-action-sheet */ "uview-ui/components/u-action-sheet/u-action-sheet").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-action-sheet/u-action-sheet.vue */ 167))
+    },
+    uCalendar: function() {
+      return __webpack_require__.e(/*! import() | uview-ui/components/u-calendar/u-calendar */ "uview-ui/components/u-calendar/u-calendar").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-calendar/u-calendar.vue */ 272))
     }
   }
 } catch (e) {
@@ -818,17 +837,35 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 var _default =
 {
   name: 'billform',
-  components: {},
+  props: {
+    billInfo: {
+      type: Object,
+      default: null } },
 
+
+  watch: {
+    billInfo: function billInfo(newVal, oldVal) {
+      this.billInfo = newVal;
+      this.billInfo2BillData();
+    } },
 
   data: function data() {
     return {
       BillFormShow: false,
       billData: {
+        id: 0,
         ledger_id: 0,
+        date: '',
         type: 0,
         account_id: 0,
         amount: "",
@@ -848,8 +885,9 @@ var _default =
       gridBorder: false,
       categorySwiperCurrent: 0,
       old: {
-        categorySwiperCurrent: 0 } };
+        categorySwiperCurrent: 0 },
 
+      pickerDateShow: false };
 
   },
   methods: {
@@ -857,12 +895,23 @@ var _default =
       this.old.categorySwiperCurrent = e.detail.current;
     },
 
+    showPickerDate: function showPickerDate() {
+      this.pickerDateShow = true;
+    },
+
+    pickerDateConfirm: function pickerDateConfirm(params) {
+      this.billData.date = params.result;
+    },
+
     billType: function billType(e) {
       this.billData.type = parseInt(e.currentTarget.dataset.type);
+      this.typeChange();
+      this.billData.category_id = this.categories[0].id;
+    },
+
+    typeChange: function typeChange() {
       this.categoryColorClass = this.billData.type == 0 ? 'text-orange' : 'text-blue';
       this.categories = this.billData.type == 0 ? this.decCategories : this.inCategories;
-      this.billData.category_id = this.categories[0].id;
-
       this.categorySwiperCurrent = this.old.categorySwiperCurrent;
       this.$nextTick(function () {
         this.categorySwiperCurrent = 0;
@@ -900,15 +949,6 @@ var _default =
           });
         } });
 
-    },
-
-    UploadImages: function UploadImages() {
-      var files = this.chooseImages.map(function (value, index) {
-        return {
-          name: 'images' + index,
-          uri: value };
-
-      });
     },
 
     ViewImage: function ViewImage(e) {
@@ -969,6 +1009,7 @@ var _default =
 
     initBillData: function initBillData() {
       this.categories = this.decCategories;
+      this.billData.id = 0;
       this.billData.ledger_id = 0;
       this.billData.type = 0;
       this.billData.account_id = 0;
@@ -977,9 +1018,39 @@ var _default =
       this.billData.note = '';
       this.billData.images = [];
       this.chooseImages = [];
+      this.initDate();
+    },
+
+    billInfo2BillData: function billInfo2BillData() {
+      this.billData.id = this.billInfo.id;
+      this.billData.ledger_id = this.billInfo.ledger_id;
+      this.billData.date = this.billInfo.date_text;
+      this.billData.type = this.billInfo.type;
+      this.billData.account_id = this.billInfo.account_id;
+      this.billData.amount = Math.abs(this.billInfo.amount);
+      this.billData.category_id = this.billInfo.category_id;
+      this.billData.note = this.billInfo.note;
+      this.billData.images = this.billInfo.images;
+      this.chooseImages = this.billInfo.images;
+      this.accountName = this.billInfo.account.text;
+      if (this.billInfo.type == 1) {
+        this.categories = this.decCategories;
+      } else {
+        this.categories = this.inCategories;
+      }
+      this.typeChange();
+    },
+
+    initDate: function initDate() {
+      var year = new Date().getFullYear();
+      var month = new Date().getMonth() + 1;
+      var day = new Date().getDate();
+      month = month < 10 ? '0' + month : month;
+      this.billData.date = year + '-' + month + '-' + day;
     },
 
     save: function save() {var _this5 = this;
+      var title = this.billData.id > 0 ? '更新' : '创建';
       if (this.billData.amount == '' || this.billData.amount <= 0) {
         uni.showToast({
           title: '金额填写有误',
@@ -993,13 +1064,15 @@ var _default =
           _this5.hideBillForm();
           _this5.$emit('reload');
           uni.showToast({
-            title: '创建成功',
+            title: title + '成功',
             duration: 2000 });
 
-          _this5.initBillData();
+          if (_this5.billData.id === 0) {
+            _this5.initBillData();
+          }
         } else {
           uni.showToast({
-            title: '创建失败',
+            title: title + '失败',
             icon: 'error',
             duration: 2000 });
 
@@ -1015,6 +1088,11 @@ var _default =
 
     hideBillForm: function hideBillForm() {
       this.BillFormShow = false;
+      if (this.billData.id > 0) {
+        this.billInfo2BillData();
+      } else {
+        this.initBillData();
+      }
     } },
 
   mounted: function mounted() {
@@ -1024,6 +1102,7 @@ var _default =
 
     }
 
+    this.initDate();
     this.init();
   } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))

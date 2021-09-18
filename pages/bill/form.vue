@@ -1,12 +1,17 @@
 <template>
 	<view>
-		<view class="edit-wrap" @tap="showBillForm">
+		<view class="edit-wrap" @tap="showBillForm" v-if="billInfo == null">
 			<u-icon name="edit-pen-fill" color="#ffffff" size="46"></u-icon>
 		</view>
 		<view class="cu-modal bottom-modal" :class="BillFormShow?'show':''">
 			<view class="cu-dialog">
 				<view class="cu-bar bg-white">
 					<view class="action">总账本</view>
+					<view class="action flex-wrap asc cu-tag radius" style="min-height: 60rpx;" @tap="showPickerDate">
+						{{ billData.date }}
+						<u-icon class="arrow-down-fill margin-left-xs" name="arrow-down-fill" color="#c0c4cc" size="26">
+						</u-icon>
+					</view>
 					<view class="action" @tap="hideBillForm">
 						<text class="cuIcon-close text-red"></text>
 					</view>
@@ -21,8 +26,8 @@
 						</view>
 						<view class="action flex-wrap asc cu-tag radius" @tap="accountChange">
 							<view>{{ accountName }}
-								<u-icon class="arrow-down-fill margin-left-xs" name="arrow-down-fill"
-									color="#c0c4cc" size="26">
+								<u-icon class="arrow-down-fill margin-left-xs" name="arrow-down-fill" color="#c0c4cc"
+									size="26">
 								</u-icon>
 							</view>
 						</view>
@@ -30,8 +35,7 @@
 					<view class="amount-wrap">
 						<view class="cu-form-group margin-top-xl border-bottom">
 							<text class="text-xxl text-black text-bold">￥</text>
-							<input name="input" type="digit" class="amount-input"
-								v-model="billData.amount"></input>
+							<input name="input" type="digit" class="amount-input" v-model="billData.amount"></input>
 						</view>
 					</view>
 					<swiper class="screen-swiper round-dot" :indicator-dots="true" :autoplay="false" duration="500"
@@ -86,20 +90,34 @@
 				</view>
 			</view>
 		</view>
+		<view>
+			<u-calendar v-model="pickerDateShow" mode="date" toolTip="账单日期" @change="pickerDateConfirm"></u-calendar>
+		</view>
 	</view>
 </template>
 
 <script>
 	export default {
 		name: 'billform',
-		components: {
-			
+		props: {
+			billInfo: {
+				type: Object,
+				default: null
+			}
+		},
+		watch: {
+			billInfo: function(newVal, oldVal) {
+				this.billInfo = newVal;
+				this.billInfo2BillData();
+			}
 		},
 		data() {
 			return {
 				BillFormShow: false,
 				billData: {
+					id: 0,
 					ledger_id: 0,
+					date: '',
 					type: 0,
 					account_id: 0,
 					amount: "",
@@ -120,7 +138,8 @@
 				categorySwiperCurrent: 0,
 				old: {
 					categorySwiperCurrent: 0
-				}
+				},
+				pickerDateShow: false
 			}
 		},
 		methods: {
@@ -128,12 +147,23 @@
 				this.old.categorySwiperCurrent = e.detail.current
 			},
 
+			showPickerDate: function() {
+				this.pickerDateShow = true;
+			},
+
+			pickerDateConfirm(params) {
+				this.billData.date = params.result;
+			},
+
 			billType: function(e) {
 				this.billData.type = parseInt(e.currentTarget.dataset.type);
+				this.typeChange();
+				this.billData.category_id = this.categories[0].id;
+			},
+
+			typeChange() {
 				this.categoryColorClass = this.billData.type == 0 ? 'text-orange' : 'text-blue';
 				this.categories = this.billData.type == 0 ? this.decCategories : this.inCategories;
-				this.billData.category_id = this.categories[0].id;
-
 				this.categorySwiperCurrent = this.old.categorySwiperCurrent
 				this.$nextTick(function() {
 					this.categorySwiperCurrent = 0
@@ -169,15 +199,6 @@
 								});
 							}
 						});
-					}
-				});
-			},
-
-			UploadImages() {
-				let files = this.chooseImages.map((value, index) => {
-					return {
-						name: 'images' + index,
-						uri: value
 					}
 				});
 			},
@@ -240,6 +261,7 @@
 
 			initBillData() {
 				this.categories = this.decCategories;
+				this.billData.id = 0;
 				this.billData.ledger_id = 0;
 				this.billData.type = 0;
 				this.billData.account_id = 0;
@@ -248,9 +270,39 @@
 				this.billData.note = '';
 				this.billData.images = [];
 				this.chooseImages = [];
+				this.initDate();
+			},
+
+			billInfo2BillData() {
+				this.billData.id = this.billInfo.id;
+				this.billData.ledger_id = this.billInfo.ledger_id;
+				this.billData.date = this.billInfo.date_text;
+				this.billData.type = this.billInfo.type;
+				this.billData.account_id = this.billInfo.account_id;
+				this.billData.amount = Math.abs(this.billInfo.amount);
+				this.billData.category_id = this.billInfo.category_id;
+				this.billData.note = this.billInfo.note;
+				this.billData.images = this.billInfo.images;
+				this.chooseImages = this.billInfo.images;
+				this.accountName = this.billInfo.account.text;
+				if (this.billInfo.type == 1) {
+					this.categories = this.decCategories;
+				} else {
+					this.categories = this.inCategories;
+				}
+				this.typeChange();
+			},
+			
+			initDate() {
+				let year = new Date().getFullYear();
+				let month = new Date().getMonth() + 1;
+				let day = new Date().getDate();
+				month = month < 10 ? '0' + month : month;
+				this.billData.date = year + '-' + month + '-' + day;
 			},
 
 			save() {
+				let title = this.billData.id > 0 ? '更新' : '创建';
 				if (this.billData.amount == '' || this.billData.amount <= 0) {
 					uni.showToast({
 						title: '金额填写有误',
@@ -264,13 +316,15 @@
 						this.hideBillForm();
 						this.$emit('reload');
 						uni.showToast({
-							title: '创建成功',
+							title: title + '成功',
 							duration: 2000
 						});
-						this.initBillData();
+						if (this.billData.id === 0) {
+							this.initBillData();
+						}
 					} else {
 						uni.showToast({
-							title: '创建失败',
+							title: title + '失败',
 							icon: 'error',
 							duration: 2000
 						});
@@ -286,6 +340,11 @@
 
 			hideBillForm: function() {
 				this.BillFormShow = false;
+				if (this.billData.id > 0) {
+					this.billInfo2BillData();
+				} else {
+					this.initBillData();
+				}
 			}
 		},
 		mounted() {
@@ -293,8 +352,9 @@
 				uni.redirectTo({
 					url: '/pages/auth/auth'
 				})
-			} 
+			}
 			
+			this.initDate();
 			this.init();
 		}
 	}

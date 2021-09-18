@@ -30,15 +30,19 @@
 			<view class="cu-list menu-avatar">
 				<view class="cu-item" :class="modalName=='move-box-'+ index + index2?'move-cur':''"
 					v-for="(list, index2) in bill.lists" :key="index2" @touchstart="ListTouchStart"
-					@touchmove="ListTouchMove" @touchend="ListTouchEnd" :data-target="'move-box-' + index + index2" @tap="goDetail" :data-id="list.id">
+					@touchmove="ListTouchMove" @touchend="ListTouchEnd" :data-target="'move-box-' + index + index2"
+					@tap="goDetail" :data-id="list.id">
 					<view class="cu-avatar" :class="list.type == 0 ? 'text-orange' : 'text-blue'">
 						<i class="iconfont category-icon" :class="list.category.icon"></i>
 					</view>
 
 					<view class="content">
-						<view class="text-grey">{{ list.category.name }} <text
+						<view class="text-grey">{{ list.category.name }} <text v-if="list.account_id > 0"
 								class="text-grey text-xs cu-tag radius sm"
-								style="margin-left: 20rpx;">{{ list.time }}</text></view>
+								style="margin-left: 20rpx;">{{ list.account.title }}</text>
+							<text v-else class="text-grey text-xs cu-tag radius sm"
+								style="margin-left: 20rpx;">未选择账户</text>
+						</view>
 						<view class="text-gray text-sm flex">
 							<view class="text-cut">
 								{{ list.note }}
@@ -93,7 +97,7 @@
 				}
 				this.listTouchDirection = null
 			},
-			
+
 			delBill(e) {
 				let index = e.currentTarget.dataset.index;
 				let index2 = e.currentTarget.dataset.index2;
@@ -107,7 +111,7 @@
 					});
 				});
 			},
-			
+
 			goDetail(e) {
 				let id = e.currentTarget.dataset.id;
 				uni.navigateTo({
@@ -133,19 +137,19 @@
 	}
 
 	.margin-top-xxl {
-		margin-top: 100rpx;
+		margin-top: 300rpx;
 	}
 
 	.category-icon {
 		font-size: 68rpx;
 	}
-	
+
 	.cu-list>.cu-item .move {
-	    width: 120rpx;
+		width: 120rpx;
 	}
-	
+
 	.cu-list>.cu-item.move-cur {
-	    -webkit-transform: translateX(-120rpx);
-	    transform: translateX(-120rpx);
+		-webkit-transform: translateX(-120rpx);
+		transform: translateX(-120rpx);
 	}
 </style>

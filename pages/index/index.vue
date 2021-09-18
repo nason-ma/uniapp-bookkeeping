@@ -1,14 +1,15 @@
 <template>
-	<view>
-		<view class="index-header bg-blue" :style="[{paddingTop:CustomBar + 'px'}]">
+	<scroll-view scroll-y class="page">
+		<view class="index-header bg-blue nav fixed" :style="[{paddingTop:CustomBar + 'px'}]" id="header">
 			<view class="title date" @tap="showPickerMonth">
 				{{ filterParams.year }} 年<text class="text-xxxl month-num">{{ filterParams.month }}</text>月
 				<u-icon class="arrow-down-fill" name="arrow-down-fill" color="#c0c4cc" size="30"></u-icon>
 			</view>
-			<view class="title"><text class="cuIcon-emoji mr"></text> {{ quotation }}</view>
+			<view class="title u-flex-nowrap"><text class="cuIcon-emoji mr"></text> {{ quotation }}</view>
 			<image src="/static/images/wave.gif" mode="scaleToFill" class="gif-wave"></image>
 		</view>
-		<view class="padding flex text-center text-grey bg-white shadow-warp">
+
+		<view class="padding flex text-center text-grey bg-white shadow-warp" :style="[{paddingTop: headerHeight + 15 + 'px'}]">
 			<view class="flex flex-sub flex-direction solid-right">
 				<view class="text-xxl text-orange text-price">{{ decAmount }}</view>
 				<view class="margin-top-sm">
@@ -30,7 +31,7 @@
 		<u-picker mode="time" v-model="pickerMonthShow" :params="pickerMonthParams" :end-year="filterParams.year"
 			title="账单月份" @confirm="pickerMonthConfirm">
 		</u-picker>
-	</view>
+	</scroll-view>
 </template>
 
 <script>
@@ -43,6 +44,7 @@
 		},
 		data() {
 			return {
+				headerHeight: 0,
 				CustomBar: this.CustomBar,
 				inAmount: "0.00",
 				decAmount: "0.00",
@@ -63,6 +65,14 @@
 		},
 		onLoad: async function(options) {
 			// console.log(this.$store.state.vuex_token);
+		},
+		onShow() {
+			if (this.filterParams.year == '' || this.filterParams.month == '') {
+				this.filterParams.year = new Date().getFullYear();
+				this.filterParams.month = new Date().getMonth() + 1;
+			}
+
+			this.init();
 		},
 		onPageScroll(e) {
 			this.scrollTop = e.scrollTop;
@@ -100,15 +110,17 @@
 			}
 		},
 		mounted() {
-			this.filterParams.year = new Date().getFullYear();
-			this.filterParams.month = new Date().getMonth() + 1;
 			if (!this.$store.state.vuex_scopeUserInfo) {
 				uni.redirectTo({
 					url: '/pages/auth/auth'
 				})
-			} 
-			
-			this.init();
+			}
+
+			// this.init();
+			const query = uni.createSelectorQuery().in(this);
+			query.select('#header').boundingClientRect(data => {
+				this.headerHeight = data.height;
+			}).exec();
 		}
 	}
 </script>
@@ -124,8 +136,8 @@
 		background-image: url(../../static/images/defaultBg.png);
 		background-size: cover;
 		background-position: center;
-		position: relative;
-		z-index: 1;
+		/* position: relative; */
+		/* z-index: 1; */
 	}
 
 	.index-header .gif-wave {
@@ -152,6 +164,11 @@
 
 	.index-header .arrow-down-fill {
 		margin-left: 20rpx;
+	}
+
+	.index-header .title {
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.text-xxxl {

@@ -48,7 +48,15 @@
 			</view>
 			<view class="cu-item">
 				<view class="content">
-					<text class="text-grey">时间</text>
+					<text class="text-grey">账单日期</text>
+				</view>
+				<view class="action">
+					<text class="text-grey">{{ billInfo.date_text }}</text>
+				</view>
+			</view>
+			<view class="cu-item">
+				<view class="content">
+					<text class="text-grey">创建时间</text>
 				</view>
 				<view class="action">
 					<text class="text-grey">{{ billInfo.created_at }}</text>
@@ -70,11 +78,22 @@
 				</view>
 			</view>
 		</view>
+		<billform @reload="getDetail" ref="billform" :billInfo="billInfo"></billform>
+		
+		<view class="cu-bar bg-white shadow foot" style="display: unset;">
+			<view class="padding flex flex-direction" @tap="edit">
+				<button class="cu-btn bg-blue lg round shadow">编辑</button>
+			</view>
+		</view>
 	</view>
 </template>
 
 <script>
+	import billform from './form.vue';
 	export default {
+		components: {
+			billform
+		},
 		data() {
 			return {
 				id: 0,
@@ -90,6 +109,7 @@
 				uni.navigateBack();
 			}
 			this.id = options.id;
+			this.getDetail();
 		},
 		methods: {
 			getDetail() {
@@ -106,15 +126,18 @@
 					indicator: 'number',
 					loop: true
 				});
+			},
+			edit() {
+				this.$refs.billform.showBillForm();
 			}
 		},
 		mounted() {
-			this.getDetail();
+			
 		}
 	}
 </script>
 
-<style>
+<style scoped>
 	.page {
 		height: 100Vh;
 		width: 100vw;

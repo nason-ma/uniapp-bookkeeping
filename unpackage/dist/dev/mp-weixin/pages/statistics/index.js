@@ -84,6 +84,9 @@ try {
     },
     uActionSheet: function() {
       return __webpack_require__.e(/*! import() | uview-ui/components/u-action-sheet/u-action-sheet */ "uview-ui/components/u-action-sheet/u-action-sheet").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-action-sheet/u-action-sheet.vue */ 167))
+    },
+    uCalendar: function() {
+      return __webpack_require__.e(/*! import() | uview-ui/components/u-calendar/u-calendar */ "uview-ui/components/u-calendar/u-calendar").then(__webpack_require__.bind(null, /*! @/uview-ui/components/u-calendar/u-calendar.vue */ 272))
     }
   }
 } catch (e) {
@@ -253,17 +256,35 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 var _default =
 {
   name: 'billform',
-  components: {},
+  props: {
+    billInfo: {
+      type: Object,
+      default: null } },
 
+
+  watch: {
+    billInfo: function billInfo(newVal, oldVal) {
+      this.billInfo = newVal;
+      this.billInfo2BillData();
+    } },
 
   data: function data() {
     return {
       BillFormShow: false,
       billData: {
+        id: 0,
         ledger_id: 0,
+        date: '',
         type: 0,
         account_id: 0,
         amount: "",
@@ -283,8 +304,9 @@ var _default =
       gridBorder: false,
       categorySwiperCurrent: 0,
       old: {
-        categorySwiperCurrent: 0 } };
+        categorySwiperCurrent: 0 },
 
+      pickerDateShow: false };
 
   },
   methods: {
@@ -292,12 +314,23 @@ var _default =
       this.old.categorySwiperCurrent = e.detail.current;
     },
 
+    showPickerDate: function showPickerDate() {
+      this.pickerDateShow = true;
+    },
+
+    pickerDateConfirm: function pickerDateConfirm(params) {
+      this.billData.date = params.result;
+    },
+
     billType: function billType(e) {
       this.billData.type = parseInt(e.currentTarget.dataset.type);
+      this.typeChange();
+      this.billData.category_id = this.categories[0].id;
+    },
+
+    typeChange: function typeChange() {
       this.categoryColorClass = this.billData.type == 0 ? 'text-orange' : 'text-blue';
       this.categories = this.billData.type == 0 ? this.decCategories : this.inCategories;
-      this.billData.category_id = this.categories[0].id;
-
       this.categorySwiperCurrent = this.old.categorySwiperCurrent;
       this.$nextTick(function () {
         this.categorySwiperCurrent = 0;
@@ -335,15 +368,6 @@ var _default =
           });
         } });
 
-    },
-
-    UploadImages: function UploadImages() {
-      var files = this.chooseImages.map(function (value, index) {
-        return {
-          name: 'images' + index,
-          uri: value };
-
-      });
     },
 
     ViewImage: function ViewImage(e) {
@@ -404,6 +428,7 @@ var _default =
 
     initBillData: function initBillData() {
       this.categories = this.decCategories;
+      this.billData.id = 0;
       this.billData.ledger_id = 0;
       this.billData.type = 0;
       this.billData.account_id = 0;
@@ -412,9 +437,39 @@ var _default =
       this.billData.note = '';
       this.billData.images = [];
       this.chooseImages = [];
+      this.initDate();
+    },
+
+    billInfo2BillData: function billInfo2BillData() {
+      this.billData.id = this.billInfo.id;
+      this.billData.ledger_id = this.billInfo.ledger_id;
+      this.billData.date = this.billInfo.date_text;
+      this.billData.type = this.billInfo.type;
+      this.billData.account_id = this.billInfo.account_id;
+      this.billData.amount = Math.abs(this.billInfo.amount);
+      this.billData.category_id = this.billInfo.category_id;
+      this.billData.note = this.billInfo.note;
+      this.billData.images = this.billInfo.images;
+      this.chooseImages = this.billInfo.images;
+      this.accountName = this.billInfo.account.text;
+      if (this.billInfo.type == 1) {
+        this.categories = this.decCategories;
+      } else {
+        this.categories = this.inCategories;
+      }
+      this.typeChange();
+    },
+
+    initDate: function initDate() {
+      var year = new Date().getFullYear();
+      var month = new Date().getMonth() + 1;
+      var day = new Date().getDate();
+      month = month < 10 ? '0' + month : month;
+      this.billData.date = year + '-' + month + '-' + day;
     },
 
     save: function save() {var _this5 = this;
+      var title = this.billData.id > 0 ? '更新' : '创建';
       if (this.billData.amount == '' || this.billData.amount <= 0) {
         uni.showToast({
           title: '金额填写有误',
@@ -428,13 +483,15 @@ var _default =
           _this5.hideBillForm();
           _this5.$emit('reload');
           uni.showToast({
-            title: '创建成功',
+            title: title + '成功',
             duration: 2000 });
 
-          _this5.initBillData();
+          if (_this5.billData.id === 0) {
+            _this5.initBillData();
+          }
         } else {
           uni.showToast({
-            title: '创建失败',
+            title: title + '失败',
             icon: 'error',
             duration: 2000 });
 
@@ -450,6 +507,11 @@ var _default =
 
     hideBillForm: function hideBillForm() {
       this.BillFormShow = false;
+      if (this.billData.id > 0) {
+        this.billInfo2BillData();
+      } else {
+        this.initBillData();
+      }
     } },
 
   mounted: function mounted() {
@@ -459,6 +521,7 @@ var _default =
 
     }
 
+    this.initDate();
     this.init();
   } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
@@ -889,11 +952,15 @@ var _form = _interopRequireDefault(__webpack_require__(/*! ../bill/form.vue */ 6
 //
 //
 //
-var _default = { components: { billform: _form.default }, data: function data() {return { params: { type: 0, year: "", month: "" }, amountData: { monthAmount: '0.00', balanceAmount: '0.00', compareAmount: '0.00', amountCount: '0.00' }, date: "", pickerMonthShow: false, pickerMonthParams: { year: true, month: true, day: false }, CustomBar: this.CustomBar, authShow: true, categoryCharts: { series: [] }, monthTrendData: { categories: [], series: [] }, categorySortData: [] };}, onPullDownRefresh: function onPullDownRefresh() {this.init();setTimeout(function () {uni.stopPullDownRefresh();}, 1000);}, computed: { // 计算属性的 getter
-    inDecName: function inDecName() {return this.params.type == 0 ? '支出' : '收入';}, inDecTextColor: function inDecTextColor() {return this.params.type == 0 ? 'text-orange' : 'text-blue';}, inDecBgColor: function inDecBgColor() {return this.params.type == 0 ? 'bg-orange' : 'bg-blue';}, avatarImage: function avatarImage() {if (this.$store.state.vuex_user !== null) {return this.$store.state.vuex_user.avatar;}return '';} }, methods: { typeSelect: function typeSelect(e) {this.params.type = e.currentTarget.dataset.id;this.init();}, showPickerMonth: function showPickerMonth() {this.pickerMonthShow = true;}, pickerMonthConfirm: function pickerMonthConfirm(params) {this.params.year = params.year;this.params.month = params.month;this.date = params.year + '年' + params.month + '月';this.init();}, showAuth: function showAuth() {uni.redirectTo({ url: '/pages/auth/auth' });}, hideAuth: function hideAuth() {this.authShow = false;}, getAmounts: function getAmounts() {var _this = this;this.$u.api.Statistics.amounts(this.params).then(function (result) {_this.amountData = result;});}, getTrends: function getTrends() {var _this2 = this;this.$u.api.Statistics.trends(this.params).then(function (result) {_this2.monthTrendData.categories = result.categories;_this2.monthTrendData.series = result.series;});}, getCategoryCharts: function getCategoryCharts() {var _this3 = this;this.$u.api.Statistics.getCategoryCharts(this.params).then(function (result) {_this3.categoryCharts.series = result.series;_this3.categorySortData = result.categorySortData;});}, init: function init() {this.getAmounts();this.getTrends();this.getCategoryCharts();} }, mounted: function mounted() {if (!this.$store.state.vuex_scopeUserInfo) {uni.redirectTo({ url: '/pages/auth/auth' });}var year = new Date().getFullYear();var month = new Date().getMonth() + 1;month = month < 10 ? '0' + month : month;this.date = year + '年' + month + '月';this.params.year = year;
-    this.params.month = month;
+var _default = { components: { billform: _form.default }, data: function data() {return { params: { type: 0, year: "", month: "" }, amountData: { monthAmount: '0.00', balanceAmount: '0.00', compareAmount: '0.00', amountCount: '0.00' }, date: "", pickerMonthShow: false, pickerMonthParams: { year: true, month: true, day: false }, CustomBar: this.CustomBar, authShow: true, categoryCharts: { series: [] }, monthTrendData: { categories: [], series: [] }, categorySortData: [] };}, onShow: function onShow() {if (this.params.year == '' || this.params.month == '') {var year = new Date().getFullYear();var month = new Date().getMonth() + 1;month = month < 10 ? '0' + month : month;this.date = year + '年' + month + '月';this.params.year = year;this.params.month = month;}this.init();}, onPullDownRefresh: function onPullDownRefresh() {this.init();setTimeout(function () {uni.stopPullDownRefresh();}, 1000);}, computed: { // 计算属性的 getter
+    inDecName: function inDecName() {return this.params.type == 0 ? '支出' : '收入';}, inDecTextColor: function inDecTextColor() {return this.params.type == 0 ? 'text-orange' : 'text-blue';}, inDecBgColor: function inDecBgColor() {return this.params.type == 0 ? 'bg-orange' : 'bg-blue';}, avatarImage: function avatarImage() {if (this.$store.state.vuex_user !== null) {return this.$store.state.vuex_user.avatar;}return '';} }, methods: { typeSelect: function typeSelect(e) {this.params.type = e.currentTarget.dataset.id;this.init();}, showPickerMonth: function showPickerMonth() {this.pickerMonthShow = true;}, pickerMonthConfirm: function pickerMonthConfirm(params) {this.params.year = params.year;this.params.month = params.month;this.date = params.year + '年' + params.month + '月';this.init();}, showAuth: function showAuth() {uni.redirectTo({ url: '/pages/auth/auth' });}, hideAuth: function hideAuth() {this.authShow = false;}, getAmounts: function getAmounts() {var _this = this;this.$u.api.Statistics.amounts(this.params).then(function (result) {_this.amountData = result;});}, getTrends: function getTrends() {var _this2 = this;this.$u.api.Statistics.trends(this.params).then(function (result) {_this2.monthTrendData.categories = result.categories;_this2.monthTrendData.series = result.series;});}, getCategoryCharts: function getCategoryCharts() {var _this3 = this;this.$u.api.Statistics.getCategoryCharts(this.params).then(function (result) {_this3.categoryCharts.series = result.series;_this3.categorySortData = result.categorySortData;});}, init: function init() {this.getAmounts();this.getTrends();this.getCategoryCharts();} }, mounted: function mounted() {
+    if (!this.$store.state.vuex_scopeUserInfo) {
+      uni.redirectTo({
+        url: '/pages/auth/auth' });
 
-    this.init();
+    }
+
+    // this.init();
   } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 

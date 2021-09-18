@@ -8,16 +8,16 @@
 	background-color: unset;
 }
 .margin-top-xxl.data-v-37c4dc7d {
-	margin-top: 100rpx;
+	margin-top: 300rpx;
 }
 .category-icon.data-v-37c4dc7d {
 	font-size: 68rpx;
 }
 .cu-list>.cu-item .move.data-v-37c4dc7d {
-    width: 120rpx;
+	width: 120rpx;
 }
 .cu-list>.cu-item.move-cur.data-v-37c4dc7d {
-    -webkit-transform: translateX(-120rpx);
-    transform: translateX(-120rpx);
+	-webkit-transform: translateX(-120rpx);
+	transform: translateX(-120rpx);
 }
 

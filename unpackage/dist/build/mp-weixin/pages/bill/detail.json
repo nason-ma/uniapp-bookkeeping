@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "账单详情",
-  "usingComponents": {}
+  "usingComponents": {
+    "billform": "/pages/bill/form"
+  }
 }
